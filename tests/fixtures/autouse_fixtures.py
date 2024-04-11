@@ -14,6 +14,20 @@ import composer
 from composer.devices import DeviceCPU, DeviceGPU
 from composer.utils import dist, reproducibility
 
+@pytest.fixture(autouse=True, scope="session")
+def init_distributed_process_group():
+    """
+    This fixture sets the required environment variables to initialize torch.distributed for a single GPU on a single node.
+    FIXME: don't do this
+    """
+    os.environ['RANK'] = "0"
+    os.environ['LOCAL_RANK'] = "0"
+    os.environ["NODE_RANK"] = "0"
+    os.environ["WORLD_SIZE"] = "1"
+    os.environ["LOCAL_WORLD_SIZE"] = "1"
+    os.environ['MASTER_ADDR'] = '127.0.0.1'
+    os.environ['MASTER_PORT'] = '29500'
+    torch.distributed.init_process_group()
 
 @pytest.fixture(autouse=True)
 def disable_tokenizer_parallelism():
