@@ -159,31 +159,31 @@ class HuggingFaceModel(ComposerModel):
                 'The tokenizer was not provided. This means the tokenizer config will not be saved in the checkpoint.',
             )
 
-        if self.tokenizer is not None and self.config.vocab_size < self.tokenizer.get_vocab_size():
+        if self.tokenizer is not None and self.config.vocab_size < len(self.tokenizer):
             if allow_embedding_resizing:
                 # when the embedding size is smaller than the tokenizer vocab size,
                 # the embeddings should get resized to match the tokenizer vocab size
                 log.warning(
                     f'The number of tokens in the tokenizer is greater than the number of tokens in the model.'
                     f' This would cause an error during training.'
-                    f' Resizing the model embeddings to {self.tokenizer.get_vocab_size()} from {self.config.vocab_size}.',
+                    f' Resizing the model embeddings to {len(self.tokenizer)} from {self.config.vocab_size}.',
                 )
-                self.model.resize_token_embeddings(self.tokenizer.get_vocab_size())
+                self.model.resize_token_embeddings(len(self.tokenizer))
             else:
                 raise ValueError(
                     f'The number of tokens in the tokenizer is greater than the number of tokens in the model.'
                     f' This would cause an error during training.'
-                    f' You can resize the model embeddings to {self.tokenizer.get_vocab_size()} from {self.config.vocab_size}'
+                    f' You can resize the model embeddings to {len(self.tokenizer)} from {self.config.vocab_size}'
                     f' by calling `model.resize_token_embeddings(len(tokenizer))` before calling the `HuggingFaceModel`'
                     f' constructor, or pass `allow_embedding_resizing=True` to have it done automatically.',
                 )
-        elif self.tokenizer is not None and self.config.vocab_size > self.tokenizer.get_vocab_size():
+        elif self.tokenizer is not None and self.config.vocab_size > len(self.tokenizer):
             # when the embedding size is greater than the tokenizer vocab size,
             # the embeddings do not _need_ to be resized to match the tokenizer vocab size,
             # and should be done by the user if desired
             log.info(
                 f'The number of tokens in the tokenizer is less than the number of tokens in the model.'
-                f' You may want to resize the model embeddings to {self.tokenizer.get_vocab_size()} from {self.config.vocab_size}'
+                f' You may want to resize the model embeddings to {len(self.tokenizer)} from {self.config.vocab_size}'
                 f' by calling `model.resize_token_embeddings(len(tokenizer))` before calling the `HuggingFaceModel`'
                 f' constructor. The vocab size is sometimes intentionally set to a multiple of 32 or 64 to improve'
                 f' performance.',
